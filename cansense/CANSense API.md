@@ -61,53 +61,13 @@ Checks if the CAN device is connected by sending and receiving packets.
 
 ---
 
-## CANSense API Methods
+## CANSense API Additions
 
-### Encoder Data Access
-
-```java
-long getMultiTurnCounts()
-```
-Returns the raw multi-turn encoder counts (native units).
-
-```java
-long getSingleTurnCounts()
-```
-Returns the single-turn encoder counts (0 to CountsPerRevolution-1).
-
-```java
-int getVelocityCPS()
-```
-Returns the velocity in counts per second.
-
-```java
-int getAccelerationCPS2()
-```
-Returns the acceleration in counts per second squared.
+The following methods and behaviors are available in the `CANSense` class, which extends `CoreDevice`:
 
 ---
 
-### Rotation and Position Data
-
-```java
-double getAbsRotations()
-```
-Returns the absolute rotations calculated from encoder counts.
-
-```java
-double getRotations()
-```
-Returns the relative rotations (0.0 to 1.0) calculated from absolute rotations.
-
-```java
-double getSensorVelocityRPS()
-```
-Returns the sensor velocity in rotations per second.
-
-```java
-double getSensorAccelerationRPS2()
-```
-Returns the sensor acceleration in rotations per second squared.
+### Additional Rotation and Position Methods
 
 ```java
 double getAbsPositionDegrees()

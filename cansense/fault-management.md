@@ -4,7 +4,7 @@
 
 ### Overview
 
-The CANSense encoder provides a robust fault detection and monitoring system to help diagnose hardware, communication, and operational issues. Faults are categorized as **sticky faults** (persist until cleared) and **current faults** (real-time status).
+The CANSense encoder provides a comprehensive fault detection and monitoring system to help diagnose hardware, communication, and operational issues. Faults are categorized as **sticky faults** (persist until cleared) and **current faults** (real-time status).
 
 ### Fault Types
 
@@ -62,10 +62,12 @@ The CANSense encoder provides a robust fault detection and monitoring system to 
 
 #### 6. Momentary CAN Bus Loss Fault
 
-**Description**: Temporary loss of CAN bus communication, automatically recovered.
+**Description**: Temporary loss of CAN bus communication, automatically recovered. Detected when a CAN fault clears after being set.
+
+_Short explanation: In code, the sticky fault is set when either `CANClogged` or `CANGeneral` is true, and then later both become false; this transition indicates a momentary CAN bus loss and sets the sticky flag._
 
 - **Sticky Fault**: `getStickyFault_MomentaryCanBusLoss()`, `resetStickyFault_MomentaryCanBusLoss()`
-- **Current Fault**: `getFault_MomentaryCanBusLoss()`
+- **Current Fault**: _Not available as a direct current fault; sticky only_
 
 **Troubleshooting**:
 - Check for loose connections or intermittent wiring.
@@ -100,14 +102,9 @@ The CANSense encoder provides a robust fault detection and monitoring system to 
 **Troubleshooting**:
 - Check power supply and wiring quality.
 
-### Usage Examples
 
-All examples assume you are using WPILib and Java.
-
-#### Basic Fault Monitoring
 
 ```java
-// WPILib context: Called from robotPeriodic() or similar
 CANSense encoder = new CANSense(1, true);
 
 if (encoder.getFault_Hardware()) {
@@ -125,7 +122,6 @@ if (encoder.getStickyFault_CANGeneral()) {
 #### Comprehensive Fault Check
 
 ```java
-// WPILib context: Utility method in your robot code
 public void checkAllFaults(CANSense encoder) {
     boolean hasCurrentFaults = encoder.getFault_Hardware() ||
                               encoder.getFault_BootDuringEnable() ||
@@ -153,7 +149,6 @@ public void checkAllFaults(CANSense encoder) {
 #### Periodic Fault Reset
 
 ```java
-// WPILib context: Called from a maintenance or periodic method
 public void periodicFaultMaintenance(CANSense encoder) {
     encoder.resetStickyFaults();
 
@@ -167,7 +162,6 @@ public void periodicFaultMaintenance(CANSense encoder) {
 #### Fault-Safe Operation
 
 ```java
-// WPILib context: Used in subsystem or command logic
 public boolean isEncoderHealthy(CANSense encoder) {
     return !encoder.getFault_Hardware() &&
            !encoder.getFault_BadMagnet() &&

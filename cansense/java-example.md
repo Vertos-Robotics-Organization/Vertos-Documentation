@@ -93,3 +93,115 @@ public class Robot extends TimedRobot {
 }
 
 ```
+## Fault Handling Examples
+
+The **CANSense** encoder provides fault detection and reporting methods to help ensure safe and reliable operation. Below are examples of how to use these features within a WPILib robot project.
+
+### Basic Fault Detection
+
+```java
+CANSense encoder = new CANSense(1, true);
+
+if (encoder.getFault_Hardware()) {
+  System.out.println("Hardware fault detected!");
+}
+if (encoder.getFault_BadMagnet()) {
+  System.out.println("Magnet alignment issue detected!");
+}
+if (encoder.getStickyFault_CANGeneral()) {
+  System.out.println("CAN communication issues have occurred");
+  encoder.resetStickyFault_CANGeneral();
+}
+```
+
+### Comprehensive Fault Check
+
+You can create a utility method to check all relevant faults and sticky faults:
+
+```java
+public void checkAllFaults(CANSense encoder) {
+  boolean hasCurrentFaults = encoder.getFault_Hardware() ||
+                encoder.getFault_BootDuringEnable() ||
+                encoder.getFault_LoopOverrun() ||
+                encoder.getFault_BadMagnet() ||
+                encoder.getFault_CANGeneral() ||
+                encoder.getFault_MomentaryCanBusLoss() ||
+                encoder.getFault_CANClogged() ||
+                encoder.getFault_RotationOverspeed() ||
+                encoder.getFault_UnderVolted();
+
+  if (hasCurrentFaults) {
+    System.out.println("Active faults detected - check encoder status");
+  }
+
+  if (encoder.getStickyFault_Hardware()) {
+    System.out.println("Hardware fault has occurred");
+  }
+  if (encoder.getStickyFault_BadMagnet()) {
+    System.out.println("Magnet issues detected - check alignment");
+  }
+}
+```
+
+### Periodic Fault Reset
+
+To maintain a clean fault state, you can periodically reset sticky faults:
+
+```java
+public void periodicFaultMaintenance(CANSense encoder) {
+  encoder.resetStickyFaults();
+
+  if (encoder.getStickyFault_MomentaryCanBusLoss()) {
+    System.out.println("Clearing momentary CAN loss fault");
+    encoder.resetStickyFault_MomentaryCanBusLoss();
+  }
+}
+```
+
+### Fault-Safe Operation
+
+Before using encoder data, verify that no critical faults are present:
+
+```java
+public boolean isEncoderHealthy(CANSense encoder) {
+  return !encoder.getFault_Hardware() &&
+       !encoder.getFault_BadMagnet() &&
+       !encoder.getFault_UnderVolted();
+}
+
+public double getPositionWithFaultCheck(CANSense encoder) {
+  if (isEncoderHealthy(encoder)) {
+    return encoder.getAbsRotations();
+  } else {
+    System.err.println("Encoder fault detected - position may be unreliable");
+    return Double.NaN;
+  }
+}
+```
+
+### Integrating Fault Checks in WPILib
+
+You can incorporate these checks into your robot code, for example in `robotPeriodic()`:
+
+```java
+@Override
+public void robotPeriodic() {
+  CommandScheduler.getInstance().run();
+
+  // Read encoder data
+  sensor1.readMultiTurnCounts();
+  long position = sensor1.getMultiTurnCounts();
+
+  // Print encoder position
+  System.out.println("Encoder Position: " + position);
+
+  // Use encoder data only if healthy
+  double absPosition = getPositionWithFaultCheck(sensor1);
+  if (!Double.isNaN(absPosition)) {
+    // Use absPosition as needed
+  }
+}
+```
+
+These examples help ensure your robot can detect, report, and recover from encoder faults during operation.
+
