@@ -6,111 +6,120 @@
 
 The CANSense encoder provides a comprehensive fault detection and monitoring system to help diagnose hardware, communication, and operational issues. Faults are categorized as **sticky faults** (persist until cleared) and **current faults** (real-time status).
 
+### Fault Severity Types
+
+The CANSense encoder categorizes faults into two severity levels:
+
+- **Error Faults**: Critical issues that may significantly impact encoder functionality or safety. These require immediate attention and may affect position accuracy or device operation.
+- **Warning Faults**: Non-critical issues that indicate potential problems but don't immediately compromise core functionality. These should be monitored and addressed during maintenance windows.
+
 ### Fault Types
 
-#### 1. Hardware Fault
+#### 1. Hardware Fault (Error)
 
 **Description**: Indicates a physical hardware problem with the encoder.
 
 - **Sticky Fault**: `getStickyFault_Hardware()`, `resetStickyFault_Hardware()`
-- **Current Fault**: `getFault_Hardware()`
+- **Current Fault**: `Error_Hardware()`
 
 **Troubleshooting**:
 - Check wiring, mounting, and power supply.
 - Inspect for physical damage.
 
-#### 2. Boot During Enable Fault
+#### 2. Boot During Enable Fault (Error)
 
 **Description**: Encoder reset/booted while robot was enabled, possibly affecting position tracking.
 
 - **Sticky Fault**: `getStickyFault_BootDuringEnable()`, `resetStickyFault_BootDuringEnable()`
-- **Current Fault**: `getFault_BootDuringEnable()`
+- **Current Fault**: `Error_BootDuringEnable()`
 
 **Troubleshooting**:
 - Check for power interruptions or CAN bus issues.
 
-#### 3. Loop Overrun Fault
+#### 3. Loop Overrun Fault (Warning)
 
 **Description**: Encoder's internal loop took too long to execute.
 
 - **Sticky Fault**: `getStickyFault_LoopOverrun()`, `resetStickyFault_LoopOverrun()`
-- **Current Fault**: `getFault_LoopOverrun()`
+- **Current Fault**: `Warning_LoopOverrun()`
 
 **Troubleshooting**:
 - Reduce CAN bus traffic.
 - Check for excessive noise or firmware issues.
 
-#### 4. Bad Magnet Fault
+#### 4. Bad Magnet Fault (Error)
 
 **Description**: Issues with magnetic field detection, affecting accuracy.
 
 - **Sticky Fault**: `getStickyFault_BadMagnet()`, `resetStickyFault_BadMagnet()`
-- **Current Fault**: `getFault_BadMagnet()`
+- **Current Fault**: `Error_BadMagnet()`
 
 **Troubleshooting**:
 - Check magnet alignment, strength, and for debris.
 
-#### 5. CAN General Fault
+#### 5. CAN General Fault (Warning)
 
 **Description**: General CAN bus communication issues.
 
 - **Sticky Fault**: `getStickyFault_CANGeneral()`, `resetStickyFault_CANGeneral()`
-- **Current Fault**: `getFault_CANGeneral()`
+- **Current Fault**: `Warning_CANGeneral()`
 
 **Troubleshooting**:
 - Check CAN wiring, speed, and termination.
 
-#### 6. Momentary CAN Bus Loss Fault
+#### 6. Momentary CAN Bus Loss Fault (Warning)
 
 **Description**: Temporary loss of CAN bus communication, automatically recovered. Detected when a CAN fault clears after being set.
 
 _Short explanation: In code, the sticky fault is set when either `CANClogged` or `CANGeneral` is true, and then later both become false; this transition indicates a momentary CAN bus loss and sets the sticky flag._
 
 - **Sticky Fault**: `getStickyFault_MomentaryCanBusLoss()`, `resetStickyFault_MomentaryCanBusLoss()`
-- **Current Fault**: _Not available as a direct current fault; sticky only_
+- **Current Fault**: `Warning_MomentaryCanBusLoss()`
 
 **Troubleshooting**:
 - Check for loose connections or intermittent wiring.
 
-#### 7. CAN Clogged Fault
+#### 7. CAN Clogged Fault (Warning)
 
 **Description**: CAN bus overloaded with traffic.
 
 - **Sticky Fault**: `getStickyFault_CANClogged()`, `resetStickyFault_CANClogged()`
-- **Current Fault**: `getFault_CANClogged()`
+- **Current Fault**: `Warning_CANClogged()`
 
 **Troubleshooting**:
 - Reduce message frequency or optimize bus usage.
 
-#### 8. Rotation Overspeed Fault
+#### 8. Rotation Overspeed Fault (Error)
 
 **Description**: Encoder rotation speed exceeded safe limits.
 
 - **Sticky Fault**: `getStickyFault_RotationOverspeed()`, `resetStickyFault_RotationOverspeed()`
-- **Current Fault**: `getFault_RotationOverspeed()`
+- **Current Fault**: `Error_RotationOverspeed()`
 
 **Troubleshooting**:
 - Check RPM, gear ratios, and mechanical limits.
 
-#### 9. Under Voltage Fault
+#### 9. Under Voltage Fault (Error)
 
 **Description**: Power supply voltage dropped below minimum threshold.
 
 - **Sticky Fault**: `getStickyFault_UnderVolted()`, `resetStickyFault_UnderVolted()`
-- **Current Fault**: `getFault_UnderVolted()`
+- **Current Fault**: `Error_UnderVolted()`
 
 **Troubleshooting**:
 - Check power supply and wiring quality.
 
+### Code Examples
 
+#### Basic Fault Monitoring
 
 ```java
 CANSense encoder = new CANSense(1, true);
 
-if (encoder.getFault_Hardware()) {
+if (encoder.Error_Hardware()) {
     System.out.println("Hardware fault detected!");
 }
-if (encoder.getFault_BadMagnet()) {
+if (encoder.Error_BadMagnet()) {
     System.out.println("Magnet alignment issue detected!");
 }
 if (encoder.getStickyFault_CANGeneral()) {
@@ -123,18 +132,23 @@ if (encoder.getStickyFault_CANGeneral()) {
 
 ```java
 public void checkAllFaults(CANSense encoder) {
-    boolean hasCurrentFaults = encoder.getFault_Hardware() ||
-                              encoder.getFault_BootDuringEnable() ||
-                              encoder.getFault_LoopOverrun() ||
-                              encoder.getFault_BadMagnet() ||
-                              encoder.getFault_CANGeneral() ||
-                              encoder.getFault_MomentaryCanBusLoss() ||
-                              encoder.getFault_CANClogged() ||
-                              encoder.getFault_RotationOverspeed() ||
-                              encoder.getFault_UnderVolted();
+    boolean hasErrorFaults = encoder.Error_Hardware() ||
+                            encoder.Error_BootDuringEnable() ||
+                            encoder.Error_BadMagnet() ||
+                            encoder.Error_RotationOverspeed() ||
+                            encoder.Error_UnderVolted();
 
-    if (hasCurrentFaults) {
-        System.out.println("Active faults detected - check encoder status");
+    boolean hasWarningFaults = encoder.Warning_LoopOverrun() ||
+                              encoder.Warning_CANGeneral() ||
+                              encoder.Warning_MomentaryCanBusLoss() ||
+                              encoder.Warning_CANClogged();
+
+    if (hasErrorFaults) {
+        System.out.println("Critical faults detected - immediate attention required");
+    }
+    
+    if (hasWarningFaults) {
+        System.out.println("Warning faults detected - monitor and address during maintenance");
     }
 
     if (encoder.getStickyFault_Hardware()) {
@@ -163,9 +177,9 @@ public void periodicFaultMaintenance(CANSense encoder) {
 
 ```java
 public boolean isEncoderHealthy(CANSense encoder) {
-    return !encoder.getFault_Hardware() &&
-           !encoder.getFault_BadMagnet() &&
-           !encoder.getFault_UnderVolted();
+    return !encoder.Error_Hardware() &&
+           !encoder.Error_BadMagnet() &&
+           !encoder.Error_UnderVolted();
 }
 
 public double getPositionWithFaultCheck(CANSense encoder) {
@@ -180,7 +194,8 @@ public double getPositionWithFaultCheck(CANSense encoder) {
 
 ### Best Practices
 
-- Monitor faults periodically and log occurrences.
+- Monitor error faults continuously for immediate response.
+- Check warning faults periodically and address during maintenance.
 - Use sticky faults for historical tracking.
 - Reset sticky faults at appropriate intervals.
 - Integrate fault checks into robot code for safe fallback.
@@ -189,9 +204,12 @@ public double getPositionWithFaultCheck(CANSense encoder) {
 
 - `getStickyFault_*()` / `resetStickyFault_*()` — Check/reset sticky faults.
 - `resetStickyFaults()` — Clear all sticky faults.
-- `getFault_*()` — Check current fault status.
+- `Error_*()` — Check current error fault status (critical).
+- `Warning_*()` — Check current warning fault status (non-critical).
 
 **Sticky faults** persist until cleared.  
-**Current faults** reflect real-time status.
+**Current faults** reflect real-time status.  
+**Error faults** require immediate attention.  
+**Warning faults** should be monitored and addressed during maintenance.
 
 Handle faults gracefully to maintain robot functionality.
