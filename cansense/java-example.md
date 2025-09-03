@@ -18,7 +18,7 @@ This is a simple Java example demonstrating how to use the **Vertos Encoder** wi
 5. **Output Encoder Data**
    * `System.out.println("Encoder Position: " + position);` - Prints the encoder's position to the console for monitoring.
 
-## Code
+## Main.java
 
 ```java
 // Copyright (c) FIRST and other WPILib contributors.
