@@ -6,25 +6,23 @@
 * **Typical Power Consumption:** 78 mA
 * **Maximum Power Consumption (Absolute):** 175 mA
 
-#### Mechanical Characteristics
-
-* **Weight:** TBD
-* **Maximum Rotational Speed:** 100,000 RPM
-
 #### Encoder Details
 
 * **Type:** Magnetic Encoder
+* **CAN Bus Interface**
+  * **Supported Speeds:** 1 Mbps (CAN 2.0), 5 Mbps (coming soon)
 * **Resolution:** 21-bit single-turn absolute positioning
 * **Counts per Revolution (CPR):** 2,097,152
 * **Integral Non-Linearity (INL):**
   * **Factory Calibration:** 0.2°
   * **User Calibration:** 0.07°
 
-#### Communication Interface
+#### Mechanical Characteristics
 
-* **Primary Interface:** CAN
-  * **Supported Speeds:** 1 Mbps (CAN 2.0), 5 Mbps (CAN FD)
-  * **Message Format:** Extended IDs supported
+* **Weight:** 15 g
+* **Maximum Rotational Speed:** 100,000 RPM
+
+<figure><img src="../.gitbook/assets/Vertos Encoder-1.png" alt=""><figcaption></figcaption></figure>
 
 #### Additional Input/Output Interfaces
 

@@ -12,7 +12,7 @@ Make sure you have WPILib installed and open your project in **VS Code**.
 
 **2. Navigate to the Vendor Libraries Manager**
 
-* Click on the **WPILib Command Palette** (Ctrl+Shift+P or Cmd+Shift+P on macOS).
+* Click on the **WPILib Command Palette** (Ctrl+Shift+P ).
 * Search for and select **Manage Vendor Libraries**.
 
 **3. Install from a JSON URL**
@@ -26,5 +26,4 @@ Make sure you have WPILib installed and open your project in **VS Code**.
 
 **4. Verify the Installation**
 
-* After installation, you should see **CANSense** available under **Referenced Libraries** in your WPILib project.
-* You can also check the `vendordeps` folder in your project directory for the `VertosLib.json` file.
+* You can check the `vendordeps` folder in your project directory for the `VertosLib.json` file.

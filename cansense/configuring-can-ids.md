@@ -1,3 +1,7 @@
+---
+hidden: true
+---
+
 # Configuring CAN IDs
 
 ### **Getting Started**
